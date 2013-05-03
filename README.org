@@ -1,0 +1,23 @@
+* include.el: simple elisp dependency management
+  include.el allows you to easily manage elisp dependencies.  I wrote
+  it to keep my config file (kind of) sane.  You might find it useful!
+
+** Example Usage
+  (include 'clojure :depends 'slime)
+  (include 'slime)
+
+  ...
+
+  (if-included 'slime
+    (require 'slime)
+    (setq auto-mode-alist (append '(("\\.lisp$" . lisp-mode))
+                          auto-mode-alist))
+    (setq slime-net-coding-system 'utf-8-unix)
+    (slime-setup '(slime-fancy)))
+
+  (if-included 'clojure
+    (require 'clojure-mode))
+
+  ...
+
+  (eval-includes)
