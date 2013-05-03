@@ -3,6 +3,7 @@
   it to keep my config file (kind of) sane.  You might find it useful!
 
 ** Example Usage
+#+BEGIN_SRC emacs-lisp
   (include 'clojure :depends 'slime)
   (include 'slime)
 
@@ -21,3 +22,4 @@
   ...
 
   (eval-includes)
+#+END_SRC
