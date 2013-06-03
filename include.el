@@ -23,6 +23,8 @@
 ;; proper order.
 ;; 
 
+(require 'cl)
+
 (defvar *included* nil)
 (defvar *included-dependencies* (make-hash-table :test 'eq))
 (defvar *included-elisp* (make-hash-table :test 'eq))
@@ -86,3 +88,40 @@
   (order-includes)
   (dolist (incl *included*)
     (eval `(progn ,@(gethash incl *included-elisp*)))))
+
+
+(defun view-include (incl)
+  (interactive "SView include: ")
+  (if (not (included-p incl))
+      (message "%s not included"
+	       incl)
+    (save-excursion
+      (beginning-of-buffer)
+      (let* ((pt (point))
+	     (form (read (current-buffer))))
+	(while form
+	  (if (not (and
+		    (not (null form))
+		    (listp form)
+		    (or (eq (car form) 'include)
+			(eq (car form) 'if-included))
+		    (not (null (cdr form)))
+		    (not (null (cdr (cadr form))))
+		    (eq (cadr (cadr form)) incl)))
+	      (let ((new-overlay (make-overlay pt (point))))
+		(overlay-put new-overlay 'invisible t)))
+	  (setq pt (point))
+	  (if (null (save-excursion (search-forward "(" nil t)))
+	      (setq form nil)
+	    (setq form (read (current-buffer)))))))))
+  
+
+(defun unview-include ()
+  (interactive)
+  (remove-overlays))
+  
+(global-set-key (kbd "C-c m i") 'view-include)
+(global-set-key (kbd "C-c m u") 'unview-include)
+
+(provide 'include)
+;;; include.el ends here
