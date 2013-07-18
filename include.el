@@ -52,7 +52,9 @@
 ;;  `(if (included-p ,name) (progn ,@body)))
 
 (defmacro if-included (name &rest body)
-  `(if (included-p ,name) (setf (gethash ,name *included-elisp*) (quote ,body))))
+  `(if (included-p ,name)
+       (setf (gethash ,name *included-elisp*)
+	     (append (gethash ,name *included-elisp*) (quote ,body)))))
 
 (lexical-let ((time 0))
   (defun dfs-included ()
@@ -88,6 +90,7 @@
   (order-includes)
   (dolist (incl *included*)
     (eval `(progn ,@(gethash incl *included-elisp*)))))
+(add-hook 'after-init-hook 'eval-included)
 
 
 (defun view-include (incl)
@@ -119,9 +122,33 @@
 (defun unview-include ()
   (interactive)
   (remove-overlays))
-  
+
+
+(defun form-to-string (form)
+  (prin1-to-string form))
+
+(defun package-include (incl)
+  (interactive "SPackage include: ")
+  (if (not (included-p incl))
+      (message "%s not included"
+	       incl)
+    (let ((package-buffer (create-file-buffer (concat (symbol-name incl) ".el"))))
+      (save-excursion 
+	(set-buffer package-buffer)
+	(emacs-lisp-mode)
+	(mapc (lambda (form)
+		(insert (pp form))
+		(newline))
+	      (gethash incl *included-elisp*))
+	(newline) 
+	(insert (format "(provide '%S)" incl))
+	(newline)
+	(insert (format ";; %S.el ends here" incl)))
+      (switch-to-buffer-other-window package-buffer))))
+		  
 (global-set-key (kbd "C-c m i") 'view-include)
 (global-set-key (kbd "C-c m u") 'unview-include)
+
 
 (provide 'include)
 ;;; include.el ends here
