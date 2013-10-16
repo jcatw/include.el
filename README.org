@@ -4,24 +4,3 @@
 
   Check out [[http://www.hackscience.org/2013/06/include.el.html][this blog post]] for a more detailed description.
 
-** Example Usage
-#+BEGIN_SRC emacs-lisp
-  (include 'clojure :depends 'slime)
-  (include 'slime)
-
-  ...
-
-  (if-included 'slime
-    (require 'slime)
-    (setq auto-mode-alist (append '(("\\.lisp$" . lisp-mode))
-                          auto-mode-alist))
-    (setq slime-net-coding-system 'utf-8-unix)
-    (slime-setup '(slime-fancy)))
-
-  (if-included 'clojure
-    (require 'clojure-mode))
-
-  ...
-
-  (eval-includes)
-#+END_SRC
