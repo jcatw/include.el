@@ -146,8 +146,8 @@
 	(insert (format ";; %S.el ends here" incl)))
       (switch-to-buffer-other-window package-buffer))))
 		  
-(global-set-key (kbd "C-c m i") 'view-include)
-(global-set-key (kbd "C-c m u") 'unview-include)
+;;(global-set-key (kbd "C-c m i") 'view-include)
+;;(global-set-key (kbd "C-c m u") 'unview-include)
 
 
 (provide 'include)
